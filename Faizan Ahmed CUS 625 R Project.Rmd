@@ -1,0 +1,286 @@
+---
+title: "Faizan Ahmed | CUS 625 R Project"
+output: html_notebook
+---
+
+```{r}
+install.packages("ggplot2")
+install.packages("tidyverse", dependencies = TRUE)
+```
+
+```{r}
+library("ggplot2")
+library("dplyr")
+```
+
+```{r}
+df <- read.csv(file="C:\\Users\\faiza\\OneDrive\\Desktop\\accidental_drug_related_deaths.csv", header=TRUE, sep=",")
+df
+```
+```{r}
+deaths_by_sex <- df %>% group_by(Sex) %>% 
+                    summarize(Number_Of_Deaths = n())
+
+deaths_by_sex
+```
+```{r}
+ggplot(deaths_by_sex, aes(x=reorder(Sex, -Number_Of_Deaths), y=Number_Of_Deaths)) + 
+  labs(title="Deaths by Sex", x = "Sex") +
+  geom_bar(stat='identity', fill="steelblue") +
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  geom_text(aes(label = Number_Of_Deaths), vjust = -0.5)
+```
+```{r}
+deaths_by_sex_and_race <- df %>% group_by(Sex, Race) %>% 
+                    summarize(Number_Of_Deaths = n())
+
+ggplot(deaths_by_sex_and_race, aes(fill=Race, x=reorder(Sex, -Number_Of_Deaths), y=Number_Of_Deaths)) + 
+  labs(title="Deaths by Sex and Race", x = "Sex") +
+  geom_bar(stat='identity', position="stack") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_fill_brewer(palette="Paired")
+```
+
+
+```{r}
+deaths_by_location <- df %>% group_by(Location) %>% 
+                    summarize(Number_Of_Deaths = n())
+
+deaths_by_location
+```
+
+```{r}
+deaths_by_location <- arrange(death_by_location, desc(Number_Of_Deaths))
+deaths_by_location
+```
+
+
+```{r fig.height = 5.5, fig.width = 15}
+ggplot(deaths_by_location, aes(x=reorder(Location, -Number_Of_Deaths), y=Number_Of_Deaths)) + 
+  labs(title="Deaths by Location", x = "Location") +
+  geom_bar(stat='identity', fill="steelblue") +
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  geom_text(aes(label = Number_Of_Deaths), vjust = -0.5)
+```
+
+
+```{r fig.height = 6, fig.width = 16}
+deaths_by_location_by_sex <- df %>% group_by(Location, Sex) %>% 
+                    summarize(Number_Of_Deaths = n())
+
+ggplot(data=deaths_by_location_by_sex, aes(fill=Sex, x=reorder(Location, -Number_Of_Deaths), y=Number_Of_Deaths)) +
+  labs(title="Deaths by Location Compared by Sex", x="Location") +
+  geom_bar(position="dodge", stat='identity')+
+  scale_fill_brewer(palette="Paired") + 
+  theme(plot.title = element_text(hjust = 0.5))+  
+  geom_text(aes(label = Number_Of_Deaths), position = position_dodge(0.9), vjust=-0.8)
+```
+
+```{r fig.height = 6, fig.width = 15}
+deaths_by_location_by_race <- df %>% group_by(Location, Race) %>% 
+                    summarize(Number_Of_Deaths = n())
+
+ggplot(data=deaths_by_location_by_race, aes(fill=Race, x=reorder(Location, -Number_Of_Deaths), y=Number_Of_Deaths)) +   
+  labs(title="Deaths by Location Compared by Race", x="Location") +
+  geom_bar(position="stack", stat='identity')+
+  scale_fill_brewer(palette="Paired") + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r}
+deaths_by_injury_place <- df %>% group_by(InjuryPlace) %>% 
+                    summarize(Number_Of_Deaths = n())
+
+deaths_by_injury_place %>% arrange(desc(Number_Of_Deaths))
+```
+
+
+```{r}
+deaths_by_injury_place <- df %>% group_by(InjuryPlace, Sex, Race) %>% 
+                    summarize(Number_Of_Deaths = n())
+
+deaths_by_injury_place
+```
+
+
+```{r fig.height = 12, fig.width = 8}
+ggplot(data=deaths_by_injury_place, aes(x=reorder(InjuryPlace, Number_Of_Deaths), y=Number_Of_Deaths)) +
+   labs(title="Deaths by Injury Place", x="Injury Place") +
+   geom_bar(stat="identity", fill="steelblue") +
+   theme(plot.title = element_text(hjust = 0.5)) + 
+   coord_flip()
+```
+```{r fig.height = 12, fig.width = 8}
+ggplot(data=deaths_by_injury_place, aes(fill=Sex, x=reorder(InjuryPlace, Number_Of_Deaths), y=Number_Of_Deaths)) +   
+  labs(title="Deaths by Injury Place and Sex", x="Injury Place") +
+  geom_bar(position="stack", stat='identity')+
+  scale_fill_brewer(palette="Paired") + 
+  theme(plot.title = element_text(hjust = 0.5)) +
+  coord_flip()
+```
+```{r fig.height = 12, fig.width = 8}
+ggplot(data=deaths_by_injury_place, aes(fill=Race, x=reorder(InjuryPlace, Number_Of_Deaths), y=Number_Of_Deaths)) +   
+  labs(title="Deaths by Injury Place and Race", x="Injury Place") +
+  geom_bar(position="stack", stat='identity')+
+  scale_fill_brewer(palette="Paired") + 
+  theme(plot.title = element_text(hjust = 0.5)) +
+  coord_flip()
+```
+
+```{r}
+deaths_by_county <- df %>% group_by(DeathCounty) %>% 
+                    summarize(Number_Of_Deaths = n())
+
+deaths_by_county
+```
+
+
+```{r}
+deaths_by_county %>% 
+  ggplot(aes(reorder(DeathCounty, Number_Of_Deaths), Number_Of_Deaths))+
+  geom_bar(stat="identity", fill="steelblue") +
+  labs(title="Deaths by County", x="Death County") +
+  geom_text(aes(label = Number_Of_Deaths),hjust = 1.4, nudge_x = .05) + 
+  coord_flip() + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r fig.height = 5, fig.width = 10}
+deaths_by_county_and_sex <- df %>% group_by(DeathCounty, Sex) %>% 
+                    summarize(Number_Of_Deaths = n())
+
+ggplot(data=deaths_by_county_and_sex, aes(fill=Sex, x=reorder(DeathCounty, Number_Of_Deaths), y=Number_Of_Deaths)) +
+   labs(title="Deaths by County and Sex", x="Death County") +
+   geom_bar(position="stack", stat='identity')+
+   scale_fill_brewer(palette="Paired") +
+   theme(plot.title = element_text(hjust = 0.5)) + 
+   geom_text(aes(label = Number_Of_Deaths), hjust=-0.2, check_overlap = TRUE) + 
+   coord_flip()
+```
+
+```{r}
+deaths_by_county_and_race <- df %>% group_by(DeathCounty, Race) %>% 
+                    summarize(Number_Of_Deaths = n())
+
+ggplot(data=deaths_by_county_and_race, aes(fill=Race, x=reorder(DeathCounty, Number_Of_Deaths), y=Number_Of_Deaths)) +
+   labs(title="Deaths by County and Race", x="Death County") +
+   geom_bar(position="stack", stat='identity')+
+   scale_fill_brewer(palette="Paired") +
+   theme(plot.title = element_text(hjust = 0.5)) + 
+   coord_flip()
+```
+
+
+```{r}
+df$Age_Grouping <- cut(df$Age, seq(0, 100, 10))
+
+deaths_by_age <- df %>% group_by(Age_Grouping) %>% 
+                    summarize(Number_Of_Deaths = n())
+
+deaths_by_age
+```
+
+
+```{r fig.height = 5, fig.width = 10}
+ggplot(deaths_by_age, aes(x=Age_Grouping, y=Number_Of_Deaths)) + 
+  labs(title="Deaths by Age Group", x = "Age Group") +
+  geom_bar(stat='identity', fill="steelblue") +
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  geom_text(aes(label = Number_Of_Deaths), vjust = 1.6) 
+```
+
+```{r fig.height = 4.5, fig.width = 10}
+deaths_by_age_and_sex <- df %>% group_by(Age_Grouping, Sex) %>% 
+                    summarize(Number_Of_Deaths = n())
+
+ggplot(data=deaths_by_age_and_sex, aes(fill=Sex, x=Age_Grouping, y=Number_Of_Deaths)) +   
+  labs(title="Deaths by Age and Sex", x="Age Group") +
+  geom_bar(position="stack", stat='identity')+
+  scale_fill_brewer(palette="Paired") + 
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  geom_text(aes(label = Number_Of_Deaths), position="stack", vjust=1.25) 
+```
+
+```{r fig.height = 4.5, fig.width = 10}
+deaths_by_age_and_race <- df %>% group_by(Age_Grouping, Race) %>% 
+                    summarize(Number_Of_Deaths = n())
+
+ggplot(data=deaths_by_age_and_race, aes(fill=Race, x=Age_Grouping, y=Number_Of_Deaths)) +   
+  labs(title="Deaths by Age and Race", x="Age Group") +
+  geom_bar(position="stack", stat='identity')+
+  scale_fill_brewer(palette="Paired") + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r}
+manner_of_death <- df %>% group_by(MannerofDeath) %>% 
+                    summarize(Number_Of_Deaths = n())
+manner_of_death
+```
+
+```{r fig.height = 5, fig.width = 10}
+ggplot(manner_of_death, aes(x=reorder(MannerofDeath, -Number_Of_Deaths), y=Number_Of_Deaths)) + 
+  labs(title="Manner of Death Comparison", x = "Manner of Death") +
+  geom_bar(stat='identity', fill="steelblue") +
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  geom_text(aes(label = Number_Of_Deaths), vjust = -0.5) 
+```
+```{r fig.height=4.5, fig.width=10}
+manner_of_death_by_sex <- df %>% group_by(MannerofDeath, Sex) %>% 
+                    summarize(Number_Of_Deaths = n())
+
+ggplot(data=manner_of_death_by_sex, aes(fill=Sex, x=reorder(MannerofDeath, -Number_Of_Deaths), y=Number_Of_Deaths)) +
+  labs(title="Manner of Death Compared by Sex", x="Manner of Death") +
+  geom_bar(position="dodge", stat='identity')+
+  scale_fill_brewer(palette="Paired") + 
+  theme(plot.title = element_text(hjust = 0.5))+  
+  geom_text(aes(label = Number_Of_Deaths), position = position_dodge(0.9), vjust=-0.5)
+```
+```{r}
+manner_of_death_by_race <- df %>% group_by(MannerofDeath, Race) %>% 
+                    summarize(Number_Of_Deaths = n())
+
+ggplot(data=manner_of_death_by_race, aes(fill=Race, x=reorder(MannerofDeath, -Number_Of_Deaths), y=Number_Of_Deaths)) +
+  labs(title="Manner of Death Compared by Race", x="Manner of Death") +
+  geom_bar(position="stack", stat='identity')+
+  scale_fill_brewer(palette="Paired") + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r}
+any_opioids <- df %>% group_by(AnyOpioid) %>% 
+                    summarize(Number_Of_Deaths = n())
+
+any_opioids
+```
+
+```{r}
+ggplot(any_opioids, aes(x=reorder(AnyOpioid, -Number_Of_Deaths), y=Number_Of_Deaths)) + 
+  labs(title="Opioid Use", x = "Any Opioids?") +
+  geom_bar(stat='identity', fill="steelblue") +
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  geom_text(aes(label = Number_Of_Deaths), vjust = -0.3) 
+```
+
+```{r}
+opioid_use_by_sex <- df %>% group_by(AnyOpioid, Sex) %>% 
+                    summarize(Number_Of_Deaths = n())
+
+ggplot(data=opioid_use_by_sex, aes(fill=Sex, x=reorder(AnyOpioid, -Number_Of_Deaths), y=Number_Of_Deaths)) +
+  labs(title="Opioid Use by Sex", x="Any Opioids?") +
+  geom_bar(position="dodge", stat='identity')+
+  scale_fill_brewer(palette="Paired") + 
+  theme(plot.title = element_text(hjust = 0.5))+  
+  geom_text(aes(label = Number_Of_Deaths), position = position_dodge(0.9), vjust=-0.3)
+```
+
+```{r}
+opioid_use_by_race <- df %>% group_by(AnyOpioid, Race) %>% 
+                    summarize(Number_Of_Deaths = n())
+
+ggplot(data=opioid_use_by_race, aes(fill=Race, x=reorder(AnyOpioid, -Number_Of_Deaths), y=Number_Of_Deaths)) +
+  labs(title="Opioid Use by Race", x="Any Opioids?") +
+  geom_bar(position="stack", stat='identity')+
+  scale_fill_brewer(palette="Paired") + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
